@@ -1,12 +1,12 @@
-import NextAuth from "next-auth";
+import NextAuth, { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
-import { compare } from "bcryptjs"; // パスワードの照合用
 import { PrismaClient } from "@prisma/client";
-// import { NextResponse } from "next/server";
+import { compare } from "bcryptjs";
 
 const prisma = new PrismaClient();
 
-const authHandler = NextAuth({
+// authOptions をエクスポートせずにローカル変数として定義する
+const authOptions: NextAuthOptions = {
   providers: [
     CredentialsProvider({
       name: "credentials",
@@ -16,37 +16,52 @@ const authHandler = NextAuth({
       },
       async authorize(credentials) {
         if (!credentials?.email || !credentials?.password) {
-          return null; // エラー発生時は `null` を返す
+          throw new Error("メールアドレスとパスワードを入力してください");
         }
 
-        try {
-          // ユーザーをデータベースで検索
-          const user = await prisma.user.findUnique({
-            where: { email: credentials.email },
-          });
+        // データベースからユーザーを取得
+        const user = await prisma.user.findUnique({
+          where: { email: credentials.email },
+        });
 
-          if (!user) {
-            return null; // ユーザーが存在しない場合
-          }
-
-          // パスワードの検証
-          const isValidPassword = await compare(credentials.password, user.password);
-          if (!isValidPassword) {
-            return null; // パスワードが間違っている場合
-          }
-
-          return { id: user.id, name: user.name, email: user.email };
-        } catch (error) {
-          console.error("認証エラー:", error);
-          return null;
+        if (!user) {
+          throw new Error("ユーザーが見つかりません");
         }
+
+        // パスワード検証
+        const isValidPassword = await compare(credentials.password, user.password);
+        if (!isValidPassword) {
+          throw new Error("パスワードが間違っています");
+        }
+
+        return { id: user.id, name: user.name, email: user.email };
       },
     }),
   ],
+  session: {
+    strategy: "jwt", // 型アサーションを削除
+  },
+  callbacks: {
+    async jwt({ token, user }: { token: { id?: string }, user?: { id: string } }) {
+      if (user) {
+        token.id = user.id;
+      }
+      return token;
+    },
+    async session({ session, token }: { session: { user: { id?: string } }, token: { id?: string } }) {
+      if (token.id) {
+        session.user.id = token.id;
+      }
+      return session;
+    },
+  },
+  secret: process.env.NEXTAUTH_SECRET,
   pages: {
     signIn: "/login",
   },
-  secret: process.env.NEXTAUTH_SECRET,
-});
+};
 
-export { authHandler as GET, authHandler as POST };
+const handler = NextAuth(authOptions);
+
+// GET と POST のみをエクスポートする
+export { handler as GET, handler as POST };
