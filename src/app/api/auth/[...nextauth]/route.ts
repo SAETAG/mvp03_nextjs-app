@@ -2,7 +2,7 @@ import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { compare } from "bcryptjs"; // パスワードの照合用
 import { PrismaClient } from "@prisma/client";
-import { NextResponse } from "next/server";
+// import { NextResponse } from "next/server";
 
 const prisma = new PrismaClient();
 
