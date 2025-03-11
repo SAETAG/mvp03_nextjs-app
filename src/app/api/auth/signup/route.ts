@@ -35,6 +35,7 @@ export async function POST(req: Request) {
 
     return NextResponse.json({ message: "ユーザー登録が完了しました", user }, { status: 201 });
   } catch (error) {
+    console.error("ユーザー登録時にエラーが発生:", error); // エラーをログに出力
     return NextResponse.json({ error: "サーバーエラーが発生しました" }, { status: 500 });
   }
 }

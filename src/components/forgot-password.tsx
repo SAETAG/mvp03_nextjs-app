@@ -29,6 +29,12 @@ export default function ForgotPasswordForm({ className, ...props }: React.Compon
 
     if (response.ok) {
       setMessage("パスワードリセット用のリンクを送信しました。メールを確認してください。");
+      
+      // ✅ 3秒後にログインページに自動遷移
+      setTimeout(() => {
+        router.push("/login");
+      }, 3000);
+      
     } else {
       setError(data.message || "エラーが発生しました。");
     }
