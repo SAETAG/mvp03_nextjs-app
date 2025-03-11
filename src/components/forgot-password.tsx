@@ -8,29 +8,29 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
-export function SignUpForm({ className, ...props }: React.ComponentPropsWithoutRef<"div">) {
-  const [name, setName] = useState("");
+export default function ForgotPasswordForm({ className, ...props }: React.ComponentPropsWithoutRef<"div">) {
   const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [message, setMessage] = useState("");
   const [error, setError] = useState("");
   const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setMessage("");
     setError("");
 
-    const response = await fetch("/api/auth/signup", {
+    const response = await fetch("/api/auth/forgot-password", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name, email, password }),
+      body: JSON.stringify({ email }),
     });
 
     const data = await response.json();
 
     if (response.ok) {
-      router.push("/login"); // 登録後にログインページへ遷移
+      setMessage("パスワードリセット用のリンクを送信しました。メールを確認してください。");
     } else {
-      setError(data.message || "登録に失敗しました");
+      setError(data.message || "エラーが発生しました。");
     }
   };
 
@@ -38,23 +38,12 @@ export function SignUpForm({ className, ...props }: React.ComponentPropsWithoutR
     <div className={cn("flex flex-col gap-6", className)} {...props}>
       <Card>
         <CardHeader>
-          <CardTitle className="text-2xl">アカウント作成</CardTitle>
-          <CardDescription>Enter your details below to create your account</CardDescription>
+          <CardTitle className="text-2xl">パスワードをリセット</CardTitle>
+          <CardDescription>登録済みのメールアドレスを入力してください</CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit}>
             <div className="flex flex-col gap-6">
-              <div className="grid gap-2">
-                <Label htmlFor="name">Name</Label>
-                <Input
-                  id="name"
-                  type="text"
-                  placeholder="John Doe"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  required
-                />
-              </div>
               <div className="grid gap-2">
                 <Label htmlFor="email">Email</Label>
                 <Input
@@ -66,25 +55,15 @@ export function SignUpForm({ className, ...props }: React.ComponentPropsWithoutR
                   required
                 />
               </div>
-              <div className="grid gap-2">
-                <Label htmlFor="password">Password</Label>
-                <Input
-                  id="password"
-                  type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                />
-              </div>
+              {message && <p className="text-green-500 text-sm">{message}</p>}
               {error && <p className="text-red-500 text-sm">{error}</p>}
               <Button type="submit" className="w-full">
-                アカウント作成
+                リセットリンクを送信
               </Button>
             </div>
             <div className="mt-4 text-center text-sm">
-              すでにアカウントを持っている方{" "}
               <a href="/login" className="underline underline-offset-4">
-                ログイン
+                ログイン画面に戻る
               </a>
             </div>
           </form>
