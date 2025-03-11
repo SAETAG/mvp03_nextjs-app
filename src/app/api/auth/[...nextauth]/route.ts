@@ -1,4 +1,5 @@
-import NextAuth, { NextAuthOptions } from "next-auth";
+import NextAuth from "next-auth/next";
+import type { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { PrismaClient } from "@prisma/client";
 import { compare } from "bcryptjs";
@@ -41,20 +42,21 @@ const authOptions: NextAuthOptions = {
   session: {
     strategy: "jwt", // 型アサーションを削除
   },
-  callbacks: {
-    async jwt({ token, user }: { token: { id?: string }, user?: { id: string } }) {
-      if (user) {
-        token.id = user.id;
-      }
-      return token;
-    },
-    async session({ session, token }: { session: { user: { id?: string } }, token: { id?: string } }) {
-      if (token.id) {
-        session.user.id = token.id;
-      }
-      return session;
-    },
+callbacks: {
+  async jwt({ token, user }) {
+    if (user) {
+      token.id = user.id;
+    }
+    return token;
   },
+  async session({ session, token }) {
+    if (token.id) {
+      // token.id が string であることを明示的に示す
+      session.user!.id = token.id as string;
+    }
+    return session;
+  },
+},
   secret: process.env.NEXTAUTH_SECRET,
   pages: {
     signIn: "/login",
