@@ -1,11 +1,12 @@
 import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { compare } from "bcryptjs"; // パスワードの照合用
-import { PrismaClient } from "@prisma/client"; // PrismaでDBを操作
+import { PrismaClient } from "@prisma/client";
+import { NextResponse } from "next/server";
 
 const prisma = new PrismaClient();
 
-export const authOptions = {
+const authHandler = NextAuth({
   providers: [
     CredentialsProvider({
       name: "credentials",
@@ -15,34 +16,37 @@ export const authOptions = {
       },
       async authorize(credentials) {
         if (!credentials?.email || !credentials?.password) {
-          throw new Error("メールアドレスとパスワードを入力してください");
+          return null; // エラー発生時は `null` を返す
         }
 
-        // ユーザーがDBに存在するかチェック
-        const user = await prisma.user.findUnique({
-          where: { email: credentials.email },
-        });
+        try {
+          // ユーザーをデータベースで検索
+          const user = await prisma.user.findUnique({
+            where: { email: credentials.email },
+          });
 
-        if (!user) {
-          throw new Error("ユーザーが見つかりません");
+          if (!user) {
+            return null; // ユーザーが存在しない場合
+          }
+
+          // パスワードの検証
+          const isValidPassword = await compare(credentials.password, user.password);
+          if (!isValidPassword) {
+            return null; // パスワードが間違っている場合
+          }
+
+          return { id: user.id, name: user.name, email: user.email };
+        } catch (error) {
+          console.error("認証エラー:", error);
+          return null;
         }
-
-        // パスワードが正しいか確認
-        const isValidPassword = await compare(credentials.password, user.password);
-        if (!isValidPassword) {
-          throw new Error("パスワードが間違っています");
-        }
-
-        return { id: user.id, name: user.name, email: user.email };
       },
     }),
   ],
   pages: {
     signIn: "/login",
   },
-  secret: process.env.NEXTAUTH_SECRET, // 環境変数から取得
-};
+  secret: process.env.NEXTAUTH_SECRET,
+});
 
-const handler = NextAuth(authOptions);
-
-export { handler as GET, handler as POST };
+export { authHandler as GET, authHandler as POST };
