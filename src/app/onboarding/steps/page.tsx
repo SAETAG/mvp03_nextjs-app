@@ -1,3 +1,5 @@
+"use client"; // 👈 追加
+
 import Link from "next/link";
 
 const steps = [

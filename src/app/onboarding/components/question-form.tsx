@@ -1,8 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import Dropdown from "@/components/onboarding/dropdown";
-import MultiSelect from "@/components/onboarding/multi-select";
+import Dropdown from "@/app/onboarding/components/dropdown";
+import MultiSelect from "@/app/onboarding/components/multi-select";
 
 interface QuestionFormProps {
   type: "dropdown" | "checkbox";

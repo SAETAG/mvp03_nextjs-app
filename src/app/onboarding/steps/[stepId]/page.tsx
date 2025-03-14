@@ -1,8 +1,8 @@
 "use client"; // 👈 クライアントコンポーネントとして指定
 
 import { useParams, useRouter } from "next/navigation";
-import QuestionForm from "@/components/onboarding/question-form";
-import StepIndicator from "@/components/onboarding/step-indicator";
+import QuestionForm from "@/app/onboarding/components/question-form";
+import StepIndicator from "@/app/onboarding/components/step-indicator";
 
 // 質問の型定義
 type QuestionType = "dropdown" | "checkbox";

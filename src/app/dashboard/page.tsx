@@ -1,3 +1,5 @@
+"use client"; // 👈 追加
+
 import { Menu, BarChart2, List, Home, Search, Phone } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
@@ -30,10 +32,12 @@ export default function Dashboard() {
                 <h3 className="text-[#2a7d67] font-bold">寝室</h3>
               </div>
               <div className="p-4 flex-1 flex flex-col">
-                <Button className="w-full py-3 bg-[#ffefd5] hover:bg-[#ffe5bc] text-[#d4a76a] border border-[#d4a76a] font-medium">
-                  クローゼット
-                </Button>
-              </div>
+                <Link href="/closet">
+                    <Button className="w-full py-3 bg-[#ffefd5] hover:bg-[#ffe5bc] text-[#d4a76a] border border-[#d4a76a] font-medium">
+                    クローゼット
+                    </Button>
+                </Link>
+                </div>
             </CardContent>
           </Card>
 
