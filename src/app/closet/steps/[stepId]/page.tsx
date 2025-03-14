@@ -89,10 +89,10 @@ function Step2Boxes() {
     <div className="w-full max-w-md bg-white p-6 rounded-lg shadow-md">
       <p>以下の4つのボックスを用意してください：</p>
       <ul className="list-disc ml-4 mt-2">
-        <li>廃棄BOX（捨てる）</li>
-        <li>収納するBOX</li>
-        <li>移動BOX（別の場所に移す）</li>
-        <li>思い出BOX（迷ったもの）</li>
+        <li>ブラックホール（捨てるもの）</li>
+        <li>VIP収納ルーム（収納するもの）</li>
+        <li>ワープ（別の場所に移すもの）</li>
+        <li>タイムカプセル（迷ったもの）</li>
       </ul>
     </div>
   );
